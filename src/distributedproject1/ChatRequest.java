@@ -11,6 +11,7 @@ import java.util.Date;
  * @author james
  */
 public class ChatRequest {
+
     String clientId;
     Date time;
     String message;

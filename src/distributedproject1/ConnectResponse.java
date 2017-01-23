@@ -10,6 +10,7 @@ import java.util.Date;
  * @author james
  */
 public class ConnectResponse {
+
     int status;
     String clientId;
     String activeChatroomNames;

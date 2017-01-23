@@ -10,6 +10,7 @@ import java.util.Date;
  * @author james
  */
 public class ChatMessage {
+
     String senderName;
     Date time;
     int messageId;

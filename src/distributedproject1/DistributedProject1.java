@@ -5,7 +5,6 @@
  */
 package distributedproject1;
 
-
 /**
  *
  * @author james
@@ -21,5 +20,5 @@ public class DistributedProject1 {
         GuiTest.appendRoom("kool cids");
         GuiTest.appendRoom("a-holes");
     }
-    
+
 }

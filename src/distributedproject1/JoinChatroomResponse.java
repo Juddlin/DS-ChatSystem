@@ -3,11 +3,11 @@
  */
 package distributedproject1;
 
-
 /**
  *
  * @author james
  */
-public class JoinChatroomResponse extends ConnectResponse{
+public class JoinChatroomResponse extends ConnectResponse {
+
     String roomMulticastIp;
 }

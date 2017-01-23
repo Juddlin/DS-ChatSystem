@@ -3,12 +3,11 @@
  */
 package distributedproject1;
 
-
 /**
  *
  * @author james
  */
-public class JoinChatroomCommand extends ConnectCommand{
+public class JoinChatroomCommand extends ConnectCommand {
 
     String chatroomName;
 
