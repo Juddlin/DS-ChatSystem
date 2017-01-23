@@ -3,11 +3,66 @@
  */
 package distributedproject1;
 
-/**
- *
- * @author james
- */
-public class JoinChatroomResponse extends ConnectResponse {
+import java.util.Date;
 
-    String roomMulticastIp;
+/**
+ * The server respond to the JoinChatroomCommand with the response containing
+ * the status of the response, clientId, the roomMulticastIp, and the time.
+ *
+ * @author James Anderson
+ * @author Garrett Goodman
+ */
+public class JoinChatroomResponse {
+
+    private int status;
+    private String clientId;
+    private String roomMulticastIp;
+    private Date time;
+
+    public JoinChatroomResponse() {
+        this.status = 0;
+        this.clientId = null;
+        this.roomMulticastIp = null;
+        this.time = null;
+    }
+    
+    public JoinChatroomResponse(int status, String clientId, String roomMulticastIp, Date time) {
+        this.status = status;
+        this.clientId = clientId;
+        this.roomMulticastIp = roomMulticastIp;
+        this.time = time;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getRoomMulticastIp() {
+        return roomMulticastIp;
+    }
+
+    public void setRoomMulticastIp(String roomMulticastIp) {
+        this.roomMulticastIp = roomMulticastIp;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+    
 }
