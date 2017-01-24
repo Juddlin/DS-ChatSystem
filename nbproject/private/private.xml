@@ -3,13 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/DistributedProject1.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/ChatRequest.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/ChatMessage.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/JoinChatroomResponse.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/ConnectResponse.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/ClientUpdateMessage.java</file>
-            <file>file:/Users/james/Google%20Drive/Distributed%20project%201/DistributedProject1/src/distributedproject1/JoinChatroomCommand.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ChatMessage.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/JoinChatroomCommand.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ConnectResponse.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/GuiTest.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ConnectCommand.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/DistributedProject1.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ClientUpdateMessage.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/JoinChatroomResponse.java</file>
+            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ChatRequest.java</file>
         </group>
     </open-files>
 </project-private>

@@ -19,7 +19,7 @@ public class ChatMessage {
     private int messageId;
     private String message;
 
-    private ChatMessage() {
+    public ChatMessage() {
         this.senderName = null;
         this.time = null;
         this.messageId = 0;
