@@ -17,8 +17,9 @@ public class DistributedProject1 {
     public static void main(String[] args) {
         GuiTest.init(args);
         GuiTest.hello();
-        GuiTest.appendRoom("kool cids");
         GuiTest.appendRoom("a-holes");
+        GuiTest.appendRoom("kool kids");
+        GuiTest.appendUser("james_is_awesome");
     }
 
 }
