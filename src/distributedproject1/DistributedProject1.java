@@ -20,6 +20,11 @@ public class DistributedProject1 {
         GuiTest.appendRoom("a-holes");
         GuiTest.appendRoom("kool kids");
         GuiTest.appendUser("james_is_awesome");
+        
+        // GUI needs an option to make either a server or client version?
+        // If server version is selected, have an idle box saying "Server Listening".
+        // If Client, start the client and list commands.
+        
     }
 
 }
