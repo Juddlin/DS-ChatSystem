@@ -31,6 +31,11 @@ public class GuiTest {
         input.grabFocus();
     }
 
+    public static void appendUser(String user){
+        users.append(user);
+        users.append("\n");
+        input.grabFocus();
+    }
     public static void init(String argv[]) {
         //The JFrame is the window itself.
         gui = new JFrame("GuiDemo");
@@ -53,7 +58,7 @@ public class GuiTest {
         roomScroll = new JScrollPane(rooms);
         usersScroll = new JScrollPane(users);
         rooms.append("CHAT ROOMS\n");
-        users.append("USERS");
+        users.append("USERS\n");
         /* Another anonymous inner class is used to listen for events from
 		   many swing components.  For a JTextField, the event will be 
 		   signaled when you hit Enter while focused on the text field.  
