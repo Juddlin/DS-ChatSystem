@@ -65,4 +65,8 @@ public class ChatMessage {
         this.message = message;
     }
 
+    @Override
+    public String toString() {
+        return this.senderName + " " + this.time + " " + this.messageId + " " + this.message;
+    }
 }

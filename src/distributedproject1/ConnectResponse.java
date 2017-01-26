@@ -64,4 +64,9 @@ public class ConnectResponse {
     public void setTime(Date time) {
         this.time = time;
     }
+    
+    @Override
+    public String toString() {
+        return this.status + " " + this.clientId + " " + this.activeChatroomNames + " " + this.time;
+    }
 }

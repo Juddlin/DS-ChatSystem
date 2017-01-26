@@ -43,4 +43,13 @@ public class ClientUpdateMessage {
         this.names = names;
     }
 
+    @Override
+    public String toString() {
+        String output = this.updateType + " ";
+        for (String name : this.names) {
+            output += name + " ";
+        }
+
+        return output;
+    }
 }

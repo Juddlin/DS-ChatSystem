@@ -55,4 +55,8 @@ public class ChatRequest {
         this.message = message;
     }
 
+    @Override
+    public String toString() {
+        return this.clientId + " " + this.time + " " + this.message;
+    }
 }

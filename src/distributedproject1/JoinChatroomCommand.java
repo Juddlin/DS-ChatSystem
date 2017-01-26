@@ -53,4 +53,9 @@ public class JoinChatroomCommand {
     public void setTime(Date time) {
         this.time = time;
     }
+    
+    @Override
+    public String toString() {
+        return this.username + " " + this.chatroomName + " " + this.time;
+    }
 }

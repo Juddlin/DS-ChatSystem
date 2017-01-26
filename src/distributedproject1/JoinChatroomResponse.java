@@ -64,5 +64,9 @@ public class JoinChatroomResponse {
     public void setTime(Date time) {
         this.time = time;
     }
-    
+
+    @Override
+    public String toString() {
+        return this.status + " " + this.clientId + " " + this.roomMulticastIp + " " + this.time;
+    }
 }
