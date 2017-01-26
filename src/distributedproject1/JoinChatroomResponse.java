@@ -67,6 +67,10 @@ public class JoinChatroomResponse {
 
     @Override
     public String toString() {
-        return this.status + " " + this.clientId + " " + this.roomMulticastIp + " " + this.time;
+        return CommandType.JOIN_CHATROOM_RESPONSE + " " + 
+                String.valueOf(this.status).length() + " " + this.status + " " + 
+                this.clientId.length() + " " + this.clientId + " " + 
+                roomMulticastIp.length() + " " + this.roomMulticastIp + " " + 
+                this.time.toString().length() + " " + this.time;
     }
 }
