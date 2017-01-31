@@ -67,6 +67,10 @@ public class ChatMessage {
 
     @Override
     public String toString() {
-        return this.senderName + " " + this.time + " " + this.messageId + " " + this.message;
+        return CommandType.CHAT_MESSAGE.ordinal() + " " +
+                senderName.length() + " " + this.senderName + " " + 
+                this.time.toString().length() + " " + this.time + " " + 
+                String.valueOf(this.messageId).length() + " " + this.messageId + " " + 
+                this.message.length() + " " + this.message;
     }
 }
