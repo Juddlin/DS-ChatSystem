@@ -67,7 +67,7 @@ public class JoinChatroomResponse {
 
     @Override
     public String toString() {
-        return CommandType.JOIN_CHATROOM_RESPONSE + " " + 
+        return CommandType.JOIN_CHATROOM_RESPONSE.ordinal() + " " + 
                 String.valueOf(this.status).length() + " " + this.status + " " + 
                 this.clientId.length() + " " + this.clientId + " " + 
                 roomMulticastIp.length() + " " + this.roomMulticastIp + " " + 

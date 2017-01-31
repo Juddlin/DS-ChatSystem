@@ -67,6 +67,10 @@ public class ConnectResponse {
     
     @Override
     public String toString() {
-        return this.status + " " + this.clientId + " " + this.activeChatroomNames + " " + this.time;
+        return CommandType.CONNECT_RESPONSE.ordinal() + " " + 
+                String.valueOf(status).length() + " " + this.status + " " + 
+                clientId.length() + " " + this.clientId + " " + 
+                this.activeChatroomNames.length() + " " + this.activeChatroomNames + " " + 
+                this.time.toString().length() + " " + this.time;
     }
 }

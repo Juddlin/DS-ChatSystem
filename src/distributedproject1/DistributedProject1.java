@@ -17,7 +17,9 @@ public class DistributedProject1 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-  
+        ClientWindowOld.init(args);
+        ClientWindowOld.hello();
+        
         
         
         // GUI needs an option to make either a server or client version?

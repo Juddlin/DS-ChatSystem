@@ -56,6 +56,9 @@ public class JoinChatroomCommand {
     
     @Override
     public String toString() {
-        return this.username + " " + this.chatroomName + " " + this.time;
+        return CommandType.JOIN_CHATROOM_COMMAND.ordinal() + " " + 
+                this.username.length() + " " + this.username + " " + 
+                this.chatroomName.length() + " " + this.chatroomName + " " + 
+                this.time.toString().length() + " " + this.time;
     }
 }

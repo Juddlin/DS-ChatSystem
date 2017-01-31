@@ -148,10 +148,15 @@ public class CommandParser {
         str = str.substring(nextSpace + 1, str.length());
         ArrayList<String> result = new ArrayList<>();
         while (!str.equals("")) {
-            System.out.println(str);
+//            System.out.println(str);
             nextSpace = str.indexOf(" ", 0);
+            if (nextSpace < 0)
+            {
+                str = "";
+                continue;
+            }
             int nextLen = Integer.parseInt(str.substring(0, nextSpace));
-            System.out.println("nextlen = " + nextLen);
+//            System.out.println("nextlen = " + nextLen);
             str = str.substring(nextSpace + 1, str.length());
             result.add(str.substring(0, nextLen));
             if (nextLen + 1 < str.length()) {
@@ -159,10 +164,10 @@ public class CommandParser {
             } else {
                 str = "";
             }
-            System.out.println("result: " + result);
-            System.out.println("str: " + str);
-            System.out.println("str.len: " + str.length());
-            System.out.println("");
+//            System.out.println("result: " + result);
+//            System.out.println("str: " + str);
+//            System.out.println("str.len: " + str.length());
+//            System.out.println("");
         }
         return result;
     }

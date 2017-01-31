@@ -45,6 +45,8 @@ public class ConnectCommand {
     
     @Override
     public String toString() {
-        return this.username + " " + this.time;
+        return CommandType.CONNECT_COMMAND.ordinal() + " " + 
+                username.length() + " " + this.username + " " + 
+                time.toString().length() + " " + this.time;
     }
 }

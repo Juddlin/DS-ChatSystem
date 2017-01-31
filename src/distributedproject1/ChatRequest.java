@@ -57,6 +57,9 @@ public class ChatRequest {
 
     @Override
     public String toString() {
-        return this.clientId + " " + this.time + " " + this.message;
+        return CommandType.CHAT_REQUEST.ordinal() + " " + 
+                String.valueOf(clientId).length() + " " + this.clientId + " " + 
+                this.time.toString().length() + " " + this.time + " " + 
+                this.message.length() + " " + this.message;
     }
 }

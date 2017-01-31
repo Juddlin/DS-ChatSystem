@@ -45,11 +45,13 @@ public class ClientUpdateMessage {
 
     @Override
     public String toString() {
-        String output = this.updateType + " ";
+        String output = CommandType.CLIENT_UPDATE_MESSAGE.ordinal() + " " + 
+                String.valueOf(updateType).length() + " " + this.updateType + " ";
         for (String name : this.names) {
-            output += name + " ";
+            output += name.length() + " " + name + " ";
         }
-
+        //remove the last " "
+        output = output.trim();
         return output;
     }
 }
