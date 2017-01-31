@@ -7,13 +7,12 @@ package distributedproject1;
 
 /**
  *
- * @author james
+ * @author James Anderson
+ * @author Garrett Goodman
  */
 public enum CommandType {
-    CHAT_MESSAGE, CHAT_REQUEST, CLIENT_UPDATE_MESSAGE, 
+    CHAT_MESSAGE, CHAT_REQUEST, CLIENT_UPDATE_MESSAGE,
     CONNECT_COMMAND, CONNECT_RESPONSE, JOIN_CHATROOM_COMMAND,
     JOIN_CHATROOM_RESPONSE
-    
-    
-    
+
 }

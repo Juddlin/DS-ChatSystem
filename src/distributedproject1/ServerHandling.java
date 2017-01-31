@@ -9,6 +9,12 @@ package distributedproject1;
 public class ServerHandling {
 
     public ServerHandling() {
-
+        
+    }
+    
+    public void run() {
+        while(true) {
+            // do all server stuff
+        }
     }
 }
