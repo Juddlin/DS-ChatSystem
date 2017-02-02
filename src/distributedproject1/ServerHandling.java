@@ -11,45 +11,76 @@ import java.net.MulticastSocket;
  * @author James Anderson
  * @author Garrett Goodman
  */
-public class ServerHandling {
+public class ServerHandling extends Thread {
 
-    private String mCastAddress;
+    private String mCastAddressMainAddress;
     private String IPAddress;
+    private static final CommandParser PARSER = new CommandParser();
 
     public ServerHandling() {
-        this.mCastAddress = "239.255.255.255";
-        this.IPAddress = "127.0.0.1";
+        this.mCastAddressMainAddress = "239.255.255.255";
+        this.IPAddress = "443";
     }
 
+    @Override
     public void run() {
         while (true) {
-            try {
-                // Get the InetAddress of the MCAST group 
-                InetAddress ia = InetAddress.getByName(this.mCastAddress);
+            listen();
+        }
+    }
 
-                // Get the port that we will be listening on
-                int port = Integer.parseInt(this.IPAddress);
+    private void listen() {
+        try {
+            // Get the InetAddress of the MCAST group 
+            InetAddress ia = InetAddress.getByName(this.mCastAddressMainAddress);
 
-                // Create a multicast socket on the specified local port number
-                MulticastSocket ms = new MulticastSocket(port);
+            // Get the port that we will be listening on
+            int port = Integer.parseInt(this.IPAddress);
 
-                // Create an empty datagram packet
-                DatagramPacket mainDP = new DatagramPacket(new byte[128], 128);
+            // Create a multicast socket on the specified local port number
+            MulticastSocket ms = new MulticastSocket(port);
 
-                // Join a multicast group and wait for some action
-                // THIS NEEDS TO BE SLPIT APART, JOINING A GROUP AND RECEIVING IS HAPPENING SIMULTANEOUSLY HERE
-                ms.joinGroup(ia);
-                System.out.println("waiting for a packet from " + ia + "...");
-                ms.receive(mainDP);
+            // Create an empty datagram packet
+            DatagramPacket mainDP = new DatagramPacket(new byte[128], 128);
 
-                // Print out what we received and quit
-                System.out.println(new String(mainDP.getData()));
+            // Join a multicast group and wait for some action
+            // THIS NEEDS TO BE SLPIT APART, JOINING A GROUP AND RECEIVING IS HAPPENING SIMULTANEOUSLY HERE
+            ms.joinGroup(ia);
+            ms.receive(mainDP);
 
-                ms.leaveGroup(ia);
-                ms.close();
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-            }
+            // Print out what we received and quit
+            //System.out.println(new String(mainDP.getData()));
+            deserialize(CommandParser.determineType(mainDP.getData()).toString(), mainDP.getData());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void deserialize(String type, byte[] data) {
+        switch (type) {
+            case "CHAT_MESSAGE":
+                ChatMessage chatMessage = CommandParser.genChatMessage(data);
+                break;
+            case "CHAT_REQUEST":
+                ChatRequest chatRequest = CommandParser.genChatRequest(data);
+                break;
+            case "CLIENT_UPDATE_MESSAGE":
+                ClientUpdateMessage updateMessage = CommandParser.genClientUpdateMessage(data);
+                break;
+            case "CONNECT_COMMAND":
+                ConnectCommand connectCommand = CommandParser.genConnectCommand(data);
+                break;
+            case "CONNECT_RESPONSE":
+                ConnectResponse connectResponse = CommandParser.genConnectResponse(data);
+                break;
+            case "JOIN_CHATROOM_COMMAND":
+                JoinChatroomCommand joinChatroomCommand = CommandParser.genJoinChatroomCommand(data);
+                break;
+            case "JOIN_CHATROOM_RESPONSE":
+                JoinChatroomResponse joinChatroomResponse = CommandParser.genJoinChatroomResponse(data);
+                break;
+            default:
+                break;
         }
     }
 }
