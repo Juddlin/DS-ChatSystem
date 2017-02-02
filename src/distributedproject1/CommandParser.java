@@ -34,7 +34,12 @@ public class CommandParser {
      * @return the CommandType encoded in the string, otherwise null
      */
     public static CommandType determineType(String data) {
-        int index = Integer.parseInt(data.substring(0, data.indexOf(" ", 0)));
+        int index;
+        try {
+            index = Integer.parseInt(data.substring(0, data.indexOf(" ", 0)));
+        } catch (NumberFormatException e) {
+            return null;
+        }
         return determineType(index);
     }
 
@@ -150,8 +155,7 @@ public class CommandParser {
         while (!str.equals("")) {
 //            System.out.println(str);
             nextSpace = str.indexOf(" ", 0);
-            if (nextSpace < 0)
-            {
+            if (nextSpace < 0) {
                 str = "";
                 continue;
             }

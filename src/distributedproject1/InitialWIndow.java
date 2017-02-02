@@ -84,16 +84,20 @@ public class InitialWIndow extends javax.swing.JFrame {
     private void clientRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientRunActionPerformed
         clientRun.setEnabled(false);
         serverRun.setEnabled(false);
-        this.setState(Frame.ICONIFIED);
-        ClientWindow clientWindow = new ClientWindow();
-        clientWindow.init();
+        //this.setState(Frame.ICONIFIED);
+        this.dispose();
+        EnterUserName enterUserName = new EnterUserName();
+        enterUserName.init();
+        //ClientWindow clientWindow = new ClientWindow();
+        //clientWindow.init();
         //run the client
     }//GEN-LAST:event_clientRunActionPerformed
 
     private void serverRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverRunActionPerformed
         clientRun.setEnabled(false);
         serverRun.setEnabled(false);
-        this.setState(Frame.ICONIFIED);
+        //this.setState(Frame.ICONIFIED);
+        this.dispose();
         //run the server
         ServerHandling server = new ServerHandling();
         server.run();

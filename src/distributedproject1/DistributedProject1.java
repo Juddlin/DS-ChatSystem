@@ -16,16 +16,15 @@ public class DistributedProject1 {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        ClientWindowOld.init(args);
-        ClientWindowOld.hello();
-        
-        
-        
-        // GUI needs an option to make either a server or client version?
-        // If server version is selected, have an idle box saying "Server Listening".
-        // If Client, start the client and list commands.
-        
-    }
+//    public static void main(String[] args) {
+//
+//        
+//        
+//        
+//        // GUI needs an option to make either a server or client version?
+//        // If server version is selected, have an idle box saying "Server Listening".
+//        // If Client, start the client and list commands.
+//        
+//    }
 
 }

@@ -5,17 +5,65 @@
  */
 package distributedproject1;
 
+import java.awt.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Date;
+import javax.swing.JButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  *
  * @author james
  */
 public class ClientWindow extends javax.swing.JFrame {
 
+private String serverIP = "224.0.0.251";
+private String serverPort = "4000";
+private String[] serverPortIP = {serverIP, serverPort};
+
     /**
      * Creates new form ClientWindow
      */
     public ClientWindow() {
         initComponents();
+    }
+
+    public ClientWindow(String userName) throws IOException, ClassNotFoundException {
+        this.userName = userName;
+        initComponents();
+        /*
+        // send initial request to server
+        MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+        mcReceiver = new MulticastReceiver();
+        byte[] response = mcReceiver.receive(serverPortIP);
+        ConnectResponse connectResponse;
+        listofrooms = new List();
+        usersInRoom = new List();
+        if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE)
+        {
+            connectResponse = CommandParser.genConnectResponse(response);
+            this.clientId = connectResponse.getClientId();
+            String[] rooms = connectResponse.getActiveChatroomNames().split("\\s+");
+            for (String room : rooms){
+                listofrooms.add(room);
+            }
+        }
+        roomsList.add(listofrooms);
+        userList.add(usersInRoom);
+        */
+        
+        JButton receiverButton = new JButton();
+        receiverButton.setVisible(false);
+        mcReceiver = new MulticastReceiver(serverIP, serverPort, receiverButton);
+        new Thread(mcReceiver, "MulticastReceiver").start();
+        receiverButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            messageReceived();
+         }});
     }
 
     /**
@@ -53,6 +101,7 @@ public class ClientWindow extends javax.swing.JFrame {
         chatArea.setEditable(false);
         chatArea.setColumns(20);
         chatArea.setRows(5);
+        chatArea.setText("Hello, " + userName + "!\n");
         jScrollPane1.setViewportView(chatArea);
 
         roomsLabel.setText("Chat Rooms");
@@ -72,6 +121,11 @@ public class ClientWindow extends javax.swing.JFrame {
         });
 
         createRoomButton.setText("Create");
+        createRoomButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createRoomButtonActionPerformed(evt);
+            }
+        });
 
         userList.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -146,20 +200,26 @@ public class ClientWindow extends javax.swing.JFrame {
 
     private void messageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_messageFieldActionPerformed
         // TODO add your handling code here:
+        String message = messageField.getText();
         chatArea.append(messageField.getText());
         chatArea.append("\n");
         messageField.setText("");
+        ChatRequest cr = new ChatRequest(clientId, new Date(), message);
+        MulticastSender.send(serverPortIP, cr.toString());
+        
 
     }//GEN-LAST:event_messageFieldActionPerformed
 
     private void joinRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinRoomButtonActionPerformed
         // TODO add your handling code here:
+        //get the room seleced in list
     }//GEN-LAST:event_joinRoomButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public void init() {
+    private void createRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createRoomButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_createRoomButtonActionPerformed
+
+    public void runClient() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -190,8 +250,15 @@ public class ClientWindow extends javax.swing.JFrame {
 
             }
         });
+
     }
 
+    private String userName;
+    private String clientId;
+    private String roomMulticastIp;
+    private MulticastReceiver mcReceiver;
+    private List listofrooms;
+    private List usersInRoom;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton createRoomButton;
@@ -205,4 +272,24 @@ public class ClientWindow extends javax.swing.JFrame {
     private javax.swing.JLabel userLabel;
     private javax.swing.JList<String> userList;
     // End of variables declaration//GEN-END:variables
+
+   
+    private void messageReceived() {
+
+            byte[] message = mcReceiver.getBuffer();
+            if(CommandParser.determineType(message) != null)
+            
+            {switch (CommandParser.determineType(message))
+            {
+                case CHAT_MESSAGE:
+                    ChatMessage cm = CommandParser.genChatMessage(message);
+                    chatArea.append(cm.getMessage());
+                    break;
+                default:
+                    chatArea.append(new String(message));
+                    System.out.println("Invalid message");
+            }} else {
+                chatArea.append(new String(message));
+            }
+    }
 }
