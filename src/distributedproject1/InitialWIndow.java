@@ -100,7 +100,7 @@ public class InitialWIndow extends javax.swing.JFrame {
         this.dispose();
         //run the server
         ServerHandling server = new ServerHandling();
-        server.run();
+        server.start();
     }//GEN-LAST:event_serverRunActionPerformed
 
     /**
@@ -133,6 +133,7 @@ public class InitialWIndow extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new InitialWIndow().setVisible(true);
             }
