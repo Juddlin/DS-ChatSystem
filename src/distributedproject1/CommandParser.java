@@ -5,6 +5,9 @@
  */
 package distributedproject1;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -151,6 +154,19 @@ public class CommandParser {
                 strings.get(2),
                 new Date(strings.get(3))
         );
+    }
+    
+    public static byte[] serializeObject(Object obj) {
+        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
+            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+                o.writeObject(obj);
+            }
+            return b.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 
     private static ArrayList<String> parseStr(String str) {
