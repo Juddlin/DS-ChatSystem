@@ -25,48 +25,66 @@ import javax.swing.event.ChangeListener;
  */
 public class ClientWindow extends javax.swing.JFrame {
 
+    // data fields
+    private String userName;
+    private String clientId;
+    private String roomMulticastIp;
+    private UnicastReceiver mainServerReceiver;
+    private MulticastReceiver chatroomReceiver;
+    private DefaultListModel<String> listofrooms;
+    private DefaultListModel<String> usersInRoom;
+    private String serverIP = "224.0.0.251";
+    private String serverPort = "4000";
+    private String[] serverPortIP = {serverIP, serverPort};
+
     /**
      * Creates new form ClientWindow
      */
     public ClientWindow() {
         initComponents();
-
-        //initialCommunication();
     }
 
+    /*
     public ClientWindow(String userName) throws IOException, ClassNotFoundException {
         this.userName = userName;
         initComponents();
 
     }
+     */
+    private void initialCommunication() throws ClassNotFoundException, IOException {
+        ConnectResponse connectResponse = new ConnectResponse();
+        connectResponse.setStatus(0);
+        listofrooms = new DefaultListModel();
+        usersInRoom = new DefaultListModel();
 
-    private void initialCommunication() throws ClassNotFoundException {
+        // send initial request to server
+        UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
         try {
-            // send initial request to server
-            MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-            mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
-            byte[] response = mainServerReceiver.receive(serverPortIP);
-            ConnectResponse connectResponse;
-            listofrooms = new DefaultListModel();
-            usersInRoom = new DefaultListModel();
-            if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
-                connectResponse = CommandParser.genConnectResponse(response);
-                this.clientId = connectResponse.getClientId();
-                String[] rooms = connectResponse.getActiveChatroomNames();
-                for (String room : rooms) {
-                    listofrooms.addElement(room);
+            mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
+
+            byte[] response = mainServerReceiver.receive();
+
+            while (connectResponse.getStatus() != 1) {
+                if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
+                    connectResponse = CommandParser.genConnectResponse(response);
+                    //resend connect command
+                    UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+                    mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
+                    response = mainServerReceiver.receive();
                 }
             }
-            roomsList.removeAll();
-            userList.removeAll();
-            listofrooms.addElement("test1");
-            listofrooms.addElement("test2");
-            roomsList.setModel(listofrooms);
-            roomsList.updateUI();
-            userList.setModel(usersInRoom);
         } catch (IOException ex) {
             Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
+        this.clientId = connectResponse.getClientId();
+        String[] rooms = connectResponse.getActiveChatroomNames();
+        for (String room : rooms) {
+            listofrooms.addElement(room);
+        }
+
+        roomsList.setModel(listofrooms);
+        userList.setModel(usersInRoom);
+        this.chatArea.append("Connection sucessful, clientId: " + this.clientId);
     }
 
     /**
@@ -191,10 +209,7 @@ public class ClientWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void messageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_messageFieldActionPerformed
-        // TODO add your handling code here:
         String message = messageField.getText();
-        //chatArea.append(messageField.getText());
-        //chatArea.append("\n");
         messageField.setText("");
         if (roomMulticastIp != null) {
             ChatRequest cr = new ChatRequest(clientId, new Date(), message);
@@ -209,7 +224,6 @@ public class ClientWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_messageFieldActionPerformed
 
     private void joinRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinRoomButtonActionPerformed
-        // TODO add your handling code here:
         //get the room seleced in list
         String room = roomsList.getSelectedValue();
         if (room == null) {
@@ -225,8 +239,7 @@ public class ClientWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_joinRoomButtonActionPerformed
 
     private void createRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createRoomButtonActionPerformed
-        // open new dialog window for user to enter room name
-        //Object[] possibilities = {"ham", "spam", "yam"};
+
         this.setFocusableWindowState(false);
         String newRoom = (String) JOptionPane.showInputDialog(
                 this,
@@ -236,26 +249,25 @@ public class ClientWindow extends javax.swing.JFrame {
 
         //If a string was returned, say so.
         if ((newRoom != null) && (newRoom.length() > 0)) {
-            String info = "Creating new chatroom: "+newRoom+"\n";
+            String info = "Creating new chatroom: " + newRoom + "\n";
             this.chatArea.append(info);
             joinChatroom(newRoom);
         }
-        //If you're here, the return value was null/empty.
         this.setFocusableWindowState(true);
     }//GEN-LAST:event_createRoomButtonActionPerformed
 
     private void joinChatroom(String room) {
         try {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date());
-            MulticastSender.send(serverPortIP, jcc.toString());
-            byte[] response = mainServerReceiver.receive(serverPortIP);
+            UnicastSender.send(serverPortIP, jcc.toString());
+            byte[] response = mainServerReceiver.receive();
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
                     // start listening for messages
                     JButton receiverButton = new JButton();
                     receiverButton.setVisible(false);
-                    roomMulticastIp = jcr.getRoomMulticastIp();
+                    this.roomMulticastIp = jcr.getRoomMulticastIp();
                     chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton);
                     receiverButton.addActionListener(new ActionListener() {
                         @Override
@@ -264,12 +276,16 @@ public class ClientWindow extends javax.swing.JFrame {
                         }
                     });
                     new Thread(chatroomReceiver, "MulticastReceiver").start();
+
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ClientWindow.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ClientWindow.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -284,16 +300,24 @@ public class ClientWindow extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ClientWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ClientWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ClientWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ClientWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -311,6 +335,7 @@ public class ClientWindow extends javax.swing.JFrame {
             getUsername();
         }
 
+        /*
         listofrooms = new DefaultListModel();
         usersInRoom = new DefaultListModel();
         roomsList.removeAll();
@@ -322,6 +347,7 @@ public class ClientWindow extends javax.swing.JFrame {
         roomsList.setModel(listofrooms);
         //roomsList.updateUI();
         userList.setModel(usersInRoom);
+         */
         //initialCommunication();
     }
 
@@ -348,30 +374,6 @@ public class ClientWindow extends javax.swing.JFrame {
         //If you're here, the return value was null/empty.
         this.setFocusableWindowState(true);
     }
-
-    private String userName;
-    private String clientId;
-    private String roomMulticastIp;
-    private MulticastReceiver mainServerReceiver;
-    private MulticastReceiver chatroomReceiver;
-    private DefaultListModel<String> listofrooms;
-    private DefaultListModel<String> usersInRoom;
-    private String serverIP = "224.0.0.251";
-    private String serverPort = "4000";
-    private String[] serverPortIP = {serverIP, serverPort};
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea chatArea;
-    private javax.swing.JButton createRoomButton;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JButton joinRoomButton;
-    private javax.swing.JTextField messageField;
-    private javax.swing.JLabel roomsLabel;
-    private javax.swing.JList<String> roomsList;
-    private javax.swing.JLabel userLabel;
-    private javax.swing.JList<String> userList;
-    // End of variables declaration//GEN-END:variables
 
     private void messageReceived() {
 
@@ -407,4 +409,19 @@ public class ClientWindow extends javax.swing.JFrame {
             chatArea.append(new String(message));
         }
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea chatArea;
+    private javax.swing.JButton createRoomButton;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JButton joinRoomButton;
+    private javax.swing.JTextField messageField;
+    private javax.swing.JLabel roomsLabel;
+    private javax.swing.JList<String> roomsList;
+    private javax.swing.JLabel userLabel;
+    private javax.swing.JList<String> userList;
+    // End of variables declaration//GEN-END:variables
+
 }
