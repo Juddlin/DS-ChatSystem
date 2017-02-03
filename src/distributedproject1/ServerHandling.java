@@ -14,12 +14,12 @@ import java.net.MulticastSocket;
 public class ServerHandling extends Thread {
 
     private String mCastAddressMainAddress;
-    private String IPAddress;
+    private String port;
     private static final Server SERVER = new Server();
 
     public ServerHandling() {
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.IPAddress = "443";
+        this.port = "443";
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ServerHandling extends Thread {
             InetAddress ia = InetAddress.getByName(this.mCastAddressMainAddress);
 
             // Get the port that we will be listening on
-            int port = Integer.parseInt(this.IPAddress);
+            int port = Integer.parseInt(this.port);
 
             // Create a multicast socket on the specified local port number
             MulticastSocket ms = new MulticastSocket(port);
