@@ -14,9 +14,10 @@ package distributedproject1;
  */
 public class ClientUpdateMessage {
 
-    private int updateType; // 0 for join, 1 for leave
+    private int updateType; // 0 for join, 1 for leave, 2 for chatroom updates
     private String[] names;
-
+    
+    
     public ClientUpdateMessage() {
         this.updateType = -1;
         this.names = null;
@@ -43,6 +44,7 @@ public class ClientUpdateMessage {
         this.names = names;
     }
 
+    
     @Override
     public String toString() {
         String output = CommandType.CLIENT_UPDATE_MESSAGE.ordinal() + " " + 

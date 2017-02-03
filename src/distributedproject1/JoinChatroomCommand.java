@@ -17,17 +17,20 @@ public class JoinChatroomCommand {
     private String username;
     private String chatroomName;
     private Date time;
+    private int status; // 0 for leave, 1 for join
 
     public JoinChatroomCommand() {
         this.username = null;
         this.chatroomName = null;
         this.time = null;
+        this.status = -1;
     }
 
-    public JoinChatroomCommand(String username, String chatroomName, Date time) {
+    public JoinChatroomCommand(String username, String chatroomName, Date time, int status) {
         this.username = username;
         this.chatroomName = chatroomName;
         this.time = time;
+        this.status = status;
     }
 
     public String getUsername() {
@@ -59,6 +62,7 @@ public class JoinChatroomCommand {
         return CommandType.JOIN_CHATROOM_COMMAND.ordinal() + " " + 
                 this.username.length() + " " + this.username + " " + 
                 this.chatroomName.length() + " " + this.chatroomName + " " + 
-                this.time.toString().length() + " " + this.time;
+                this.time.toString().length() + " " + this.time + " " + 
+                String.valueOf(status).length() + " " + this.status;
     }
 }

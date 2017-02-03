@@ -137,8 +137,9 @@ public class CommandParser {
         return new JoinChatroomCommand(
                 strings.get(0),
                 strings.get(1),
-                new Date(strings.get(2))
-        );
+                new Date(strings.get(2)),
+                Integer.parseInt(strings.get(3)));
+
     }
 
     public static JoinChatroomResponse genJoinChatroomResponse(byte[] bytes) {

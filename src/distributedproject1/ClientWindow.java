@@ -266,7 +266,7 @@ public class ClientWindow extends javax.swing.JFrame {
     private void leaveRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leaveRoomButtonActionPerformed
         if (this.roomMulticastIp != null)
         {
-            UnicastSender.send(serverPortIP, new JoinChatroomCommand(this.userName, this.currentChatroom, new Date()).toString());
+            UnicastSender.send(serverPortIP, new JoinChatroomCommand(this.userName, this.currentChatroom, new Date(), 0).toString());
             this.roomMulticastIp = null;
             this.currentChatroom = null;
             this.chatArea.append("Chatroom left\n");
@@ -276,7 +276,7 @@ public class ClientWindow extends javax.swing.JFrame {
 
     private void joinChatroom(String room) {
         try {
-            JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date());
+            JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date(), 1);
             UnicastSender.send(serverPortIP, jcc.toString());
             byte[] response = mainServerReceiver.receive(this.serverPortIP);
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
@@ -409,6 +409,7 @@ public class ClientWindow extends javax.swing.JFrame {
                 case CLIENT_UPDATE_MESSAGE:
                     ClientUpdateMessage cum = CommandParser.genClientUpdateMessage(message);
                     String[] names = cum.getNames();
+                    /*
                     if (cum.getUpdateType() == 0) {
                         for (String name : names) {
                             usersInRoom.addElement(name);
@@ -417,8 +418,22 @@ public class ClientWindow extends javax.swing.JFrame {
                         for (String name : names) {
                             usersInRoom.removeElement(name);
                         }
+                    }*/
+                    if ( cum.getUpdateType() == 1 || cum.getUpdateType() == 0)
+                    {
+                        usersInRoom.clear();
+                        for (String user: cum.getNames())
+                        {
+                            usersInRoom.addElement(user);
+                        }
+                    } else if (cum.getUpdateType() == 2)
+                    {
+                        listofrooms.clear();
+                        for (String room: cum.getNames()){
+                            listofrooms.addElement(room);
+                        }
                     }
-                    userList.setListData(names);
+                    //userList.setListData(names);
                     break;
                 default:
                     chatArea.append(new String(message));
