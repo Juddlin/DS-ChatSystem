@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class ConnectResponse {
 
-    private int status;
+    private int status; // 0 bad, 1 is good
     private String clientId;
     private String[] activeChatroomNames;
     private Date time;

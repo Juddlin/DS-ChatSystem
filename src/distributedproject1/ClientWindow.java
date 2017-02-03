@@ -29,7 +29,7 @@ public class ClientWindow extends javax.swing.JFrame {
     private String userName;
     private String clientId;
     private String roomMulticastIp;
-    private MulticastReceiver mainServerReceiver;
+    private UnicastReceiver mainServerReceiver;
     private MulticastReceiver chatroomReceiver;
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
@@ -58,19 +58,19 @@ public class ClientWindow extends javax.swing.JFrame {
         usersInRoom = new DefaultListModel();
 
         // send initial request to server
-        MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+        UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
         try {
-            mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
+            mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
 
-            byte[] response = mainServerReceiver.receive(serverPortIP);
+            byte[] response = mainServerReceiver.receive();
 
             while (connectResponse.getStatus() != 1) {
                 if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
                     connectResponse = CommandParser.genConnectResponse(response);
                     //resend connect command
-                    MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-                    mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
-                    response = mainServerReceiver.receive(serverPortIP);
+                    UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+                    mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
+                    response = mainServerReceiver.receive();
                 }
             }
         } catch (IOException ex) {
@@ -84,6 +84,7 @@ public class ClientWindow extends javax.swing.JFrame {
 
         roomsList.setModel(listofrooms);
         userList.setModel(usersInRoom);
+        this.chatArea.append("Connection sucessful, clientId: " + this.clientId);
     }
 
     /**
@@ -258,15 +259,15 @@ public class ClientWindow extends javax.swing.JFrame {
     private void joinChatroom(String room) {
         try {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date());
-            MulticastSender.send(serverPortIP, jcc.toString());
-            byte[] response = mainServerReceiver.receive(serverPortIP);
+            UnicastSender.send(serverPortIP, jcc.toString());
+            byte[] response = mainServerReceiver.receive();
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
                     // start listening for messages
                     JButton receiverButton = new JButton();
                     receiverButton.setVisible(false);
-                    roomMulticastIp = jcr.getRoomMulticastIp();
+                    this.roomMulticastIp = jcr.getRoomMulticastIp();
                     chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton);
                     receiverButton.addActionListener(new ActionListener() {
                         @Override
