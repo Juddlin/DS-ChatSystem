@@ -16,7 +16,7 @@ public class ConnectResponse {
 
     private int status;
     private String clientId;
-    private String activeChatroomNames;
+    private String[] activeChatroomNames;
     private Date time;
 
     public ConnectResponse() {
@@ -26,7 +26,7 @@ public class ConnectResponse {
         this.time = null;
     }
 
-    public ConnectResponse(int status, String clientId, String activeChatroomNames, Date time) {
+    public ConnectResponse(int status, String clientId, String[] activeChatroomNames, Date time) {
         this.status = status;
         this.clientId = clientId;
         this.activeChatroomNames = activeChatroomNames;
@@ -49,11 +49,11 @@ public class ConnectResponse {
         this.clientId = clientId;
     }
 
-    public String getActiveChatroomNames() {
+    public String[] getActiveChatroomNames() {
         return this.activeChatroomNames;
     }
 
-    public void setActiveChatroomNames(String activeChatroomNames) {
+    public void setActiveChatroomNames(String[] activeChatroomNames) {
         this.activeChatroomNames = activeChatroomNames;
     }
 
@@ -67,10 +67,16 @@ public class ConnectResponse {
     
     @Override
     public String toString() {
+        String rooms = new String();
+        for (String room: this.activeChatroomNames)
+        {
+            rooms += room.length() + " " + room + " ";
+        }
         return CommandType.CONNECT_RESPONSE.ordinal() + " " + 
                 String.valueOf(status).length() + " " + this.status + " " + 
                 clientId.length() + " " + this.clientId + " " + 
-                this.activeChatroomNames.length() + " " + this.activeChatroomNames + " " + 
+                //this.activeChatroomNames.length() + " " + this.activeChatroomNames + " " + 
+                rooms + 
                 this.time.toString().length() + " " + this.time;
     }
 }

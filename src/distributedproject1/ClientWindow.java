@@ -10,7 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -19,10 +22,6 @@ import javax.swing.event.ChangeListener;
  * @author james
  */
 public class ClientWindow extends javax.swing.JFrame {
-
-private String serverIP = "224.0.0.251";
-private String serverPort = "4000";
-private String[] serverPortIP = {serverIP, serverPort};
 
     /**
      * Creates new form ClientWindow
@@ -34,11 +33,11 @@ private String[] serverPortIP = {serverIP, serverPort};
     public ClientWindow(String userName) throws IOException, ClassNotFoundException {
         this.userName = userName;
         initComponents();
-        /*
+        
         // send initial request to server
         MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-        mcReceiver = new MulticastReceiver();
-        byte[] response = mcReceiver.receive(serverPortIP);
+        mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
+        byte[] response = mainServerReceiver.receive(serverPortIP);
         ConnectResponse connectResponse;
         listofrooms = new List();
         usersInRoom = new List();
@@ -46,24 +45,15 @@ private String[] serverPortIP = {serverIP, serverPort};
         {
             connectResponse = CommandParser.genConnectResponse(response);
             this.clientId = connectResponse.getClientId();
-            String[] rooms = connectResponse.getActiveChatroomNames().split("\\s+");
+            String[] rooms = connectResponse.getActiveChatroomNames();
             for (String room : rooms){
                 listofrooms.add(room);
             }
         }
         roomsList.add(listofrooms);
         userList.add(usersInRoom);
-        */
-        
-        JButton receiverButton = new JButton();
-        receiverButton.setVisible(false);
-        mcReceiver = new MulticastReceiver(serverIP, serverPort, receiverButton);
-        new Thread(mcReceiver, "MulticastReceiver").start();
-        receiverButton.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            messageReceived();
-         }});
+         
+
     }
 
     /**
@@ -206,8 +196,6 @@ private String[] serverPortIP = {serverIP, serverPort};
         messageField.setText("");
         ChatRequest cr = new ChatRequest(clientId, new Date(), message);
         MulticastSender.send(serverPortIP, cr.toString());
-        
-
     }//GEN-LAST:event_messageFieldActionPerformed
 
     private void joinRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinRoomButtonActionPerformed
@@ -216,8 +204,51 @@ private String[] serverPortIP = {serverIP, serverPort};
     }//GEN-LAST:event_joinRoomButtonActionPerformed
 
     private void createRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createRoomButtonActionPerformed
-        // TODO add your handling code here:
+        // open new dialog window for user to enter room name
+        //Object[] possibilities = {"ham", "spam", "yam"};
+        String newRoom = (String) JOptionPane.showInputDialog(
+                this,
+                "Enter new room name:",
+                "Customized Dialog",
+                JOptionPane.PLAIN_MESSAGE);
+
+        //If a string was returned, say so.
+        if ((newRoom != null) && (newRoom.length() > 0)) {
+            joinChatroom(newRoom);
+        }
+
+        //If you're here, the return value was null/empty.
+
     }//GEN-LAST:event_createRoomButtonActionPerformed
+
+    private void joinChatroom(String room) {
+        try {
+            JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date());
+            MulticastSender.send(serverPortIP, jcc.toString());
+            byte[] response = mainServerReceiver.receive(serverPortIP);
+            if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
+                JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
+                if (jcr.getClientId().equals(this.clientId)) {
+                    // start listening for messages
+                    JButton receiverButton = new JButton();
+                    receiverButton.setVisible(false);
+                    roomMulticastIp = jcr.getRoomMulticastIp();
+                    chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton);
+                    receiverButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            messageReceived();
+                        }
+                    });
+                    new Thread(chatroomReceiver, "MulticastReceiver").start();
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public void runClient() {
         /* Set the Nimbus look and feel */
@@ -247,18 +278,20 @@ private String[] serverPortIP = {serverIP, serverPort};
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ClientWindow().setVisible(true);
-
             }
         });
-
     }
 
     private String userName;
     private String clientId;
     private String roomMulticastIp;
-    private MulticastReceiver mcReceiver;
+    private MulticastReceiver mainServerReceiver;
+    private MulticastReceiver chatroomReceiver;
     private List listofrooms;
     private List usersInRoom;
+    private String serverIP = "224.0.0.251";
+    private String serverPort = "4000";
+    private String[] serverPortIP = {serverIP, serverPort};
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton createRoomButton;
@@ -273,14 +306,11 @@ private String[] serverPortIP = {serverIP, serverPort};
     private javax.swing.JList<String> userList;
     // End of variables declaration//GEN-END:variables
 
-   
     private void messageReceived() {
 
-            byte[] message = mcReceiver.getBuffer();
-            if(CommandParser.determineType(message) != null)
-            
-            {switch (CommandParser.determineType(message))
-            {
+        byte[] message = mainServerReceiver.getBuffer();
+        if (CommandParser.determineType(message) != null) {
+            switch (CommandParser.determineType(message)) {
                 case CHAT_MESSAGE:
                     ChatMessage cm = CommandParser.genChatMessage(message);
                     chatArea.append(cm.getMessage());
@@ -288,8 +318,9 @@ private String[] serverPortIP = {serverIP, serverPort};
                 default:
                     chatArea.append(new String(message));
                     System.out.println("Invalid message");
-            }} else {
-                chatArea.append(new String(message));
             }
+        } else {
+            chatArea.append(new String(message));
+        }
     }
 }

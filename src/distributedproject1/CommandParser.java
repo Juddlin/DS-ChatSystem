@@ -111,11 +111,16 @@ public class CommandParser {
     public static ConnectResponse genConnectResponse(String data) {
         assert (determineType(data) == CommandType.CONNECT_RESPONSE);
         ArrayList<String> strings = parseStr(data);
+
+        String[] rooms = new String[strings.size() - 3];
+        for (int i = 2; i < strings.size() - 1; i++) {
+            rooms[i - 2] = strings.get(i);
+        }
         return new ConnectResponse(
                 Integer.parseInt(strings.get(0)),
                 strings.get(1),
-                strings.get(2),
-                new Date(strings.get(3))
+                rooms,
+                new Date(strings.get(strings.size() - 1))
         );
     }
 
