@@ -26,7 +26,7 @@ public class Server {
         this.users = new ArrayList<>();
         this.currentClientId = 1;
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.port = "443";
+        this.port = "4000";
     }
 
     public void chatMessage(ChatMessage message) {
@@ -79,7 +79,7 @@ public class Server {
 
             // send the message with a Time-To-Live (TTL)=1
             ms.send(dp, (byte) 1);
-
+            System.out.println("connectResponse sent");
             // tidy up - leave the group and close the socket
             ms.leaveGroup(ia);
             ms.close();

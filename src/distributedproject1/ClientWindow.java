@@ -29,13 +29,14 @@ public class ClientWindow extends javax.swing.JFrame {
     private String userName;
     private String clientId;
     private String roomMulticastIp;
-    private UnicastReceiver mainServerReceiver;
+    private MulticastReceiver mainServerReceiver;
     private MulticastReceiver chatroomReceiver;
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
-    private String serverIP = "224.0.0.251";
+    private String serverIP = "239.255.255.255";
     private String serverPort = "4000";
     private String[] serverPortIP = {serverIP, serverPort};
+    private String currentChatroom;
 
     /**
      * Creates new form ClientWindow
@@ -56,21 +57,21 @@ public class ClientWindow extends javax.swing.JFrame {
         connectResponse.setStatus(0);
         listofrooms = new DefaultListModel();
         usersInRoom = new DefaultListModel();
+        byte[] response;
 
-        // send initial request to server
-        UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
         try {
-            mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
-
-            byte[] response = mainServerReceiver.receive();
-
+            mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
+            this.chatArea.append("Waiting for response from server...\n");
+            // send initial request to server
+            UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+            response = mainServerReceiver.receive(this.serverPortIP);
             while (connectResponse.getStatus() != 1) {
                 if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
                     connectResponse = CommandParser.genConnectResponse(response);
                     //resend connect command
                     UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-                    mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
-                    response = mainServerReceiver.receive();
+                    //mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
+                    response = mainServerReceiver.receive(this.serverPortIP);
                 }
             }
         } catch (IOException ex) {
@@ -107,6 +108,7 @@ public class ClientWindow extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         userList = new javax.swing.JList<>();
         userLabel = new javax.swing.JLabel();
+        leaveRoomButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Garrett and James Super Happy Fun Riptide SharkChat");
@@ -146,6 +148,13 @@ public class ClientWindow extends javax.swing.JFrame {
 
         userLabel.setText("Users");
 
+        leaveRoomButton.setText("Leave");
+        leaveRoomButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                leaveRoomButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -153,20 +162,12 @@ public class ClientWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(roomsLabel)
-                                .addGap(20, 20, 20))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(createRoomButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(joinRoomButton)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addComponent(createRoomButton)
+                        .addComponent(joinRoomButton)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(leaveRoomButton))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
@@ -180,7 +181,11 @@ public class ClientWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(27, 27, 27)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(28, Short.MAX_VALUE))))
+                        .addContainerGap(25, Short.MAX_VALUE))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(roomsLabel)
+                .addGap(573, 573, 573))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -190,11 +195,13 @@ public class ClientWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(roomsLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(joinRoomButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(createRoomButton))
+                        .addComponent(createRoomButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(leaveRoomButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(userLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -256,11 +263,22 @@ public class ClientWindow extends javax.swing.JFrame {
         this.setFocusableWindowState(true);
     }//GEN-LAST:event_createRoomButtonActionPerformed
 
+    private void leaveRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leaveRoomButtonActionPerformed
+        if (this.roomMulticastIp != null)
+        {
+            UnicastSender.send(serverPortIP, new JoinChatroomCommand(this.userName, this.currentChatroom, new Date()).toString());
+            this.roomMulticastIp = null;
+            this.currentChatroom = null;
+            this.chatArea.append("Chatroom left\n");
+        }
+
+    }//GEN-LAST:event_leaveRoomButtonActionPerformed
+
     private void joinChatroom(String room) {
         try {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date());
             UnicastSender.send(serverPortIP, jcc.toString());
-            byte[] response = mainServerReceiver.receive();
+            byte[] response = mainServerReceiver.receive(this.serverPortIP);
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
@@ -287,6 +305,7 @@ public class ClientWindow extends javax.swing.JFrame {
             Logger.getLogger(ClientWindow.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
+        this.currentChatroom = room;
     }
 
     public void runClient_OLD() {
@@ -329,7 +348,7 @@ public class ClientWindow extends javax.swing.JFrame {
         });
     }
 
-    public void runClient() {
+    public void runClient() throws ClassNotFoundException, IOException {
         this.setVisible(true);
         while (userName == null) {
             getUsername();
@@ -348,7 +367,7 @@ public class ClientWindow extends javax.swing.JFrame {
         //roomsList.updateUI();
         userList.setModel(usersInRoom);
          */
-        //initialCommunication();
+        initialCommunication();
     }
 
     private void getUsername() {
@@ -410,6 +429,10 @@ public class ClientWindow extends javax.swing.JFrame {
         }
     }
 
+    public javax.swing.JTextArea getChatArea()
+    {
+        return this.chatArea;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea chatArea;
     private javax.swing.JButton createRoomButton;
@@ -417,6 +440,7 @@ public class ClientWindow extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JButton joinRoomButton;
+    private javax.swing.JButton leaveRoomButton;
     private javax.swing.JTextField messageField;
     private javax.swing.JLabel roomsLabel;
     private javax.swing.JList<String> roomsList;

@@ -6,6 +6,9 @@
 package distributedproject1;
 
 import java.awt.Frame;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,6 +37,7 @@ public class InitialWIndow extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("distributed chat");
 
         clientRun.setText("Client");
         clientRun.addActionListener(new java.awt.event.ActionListener() {
@@ -82,17 +86,23 @@ public class InitialWIndow extends javax.swing.JFrame {
 
     
     private void clientRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientRunActionPerformed
-        clientRun.setEnabled(false);
-        serverRun.setEnabled(false);
-        //this.setState(Frame.ICONIFIED);
-        this.dispose();
-        //EnterUserName enterUserName = new EnterUserName();
-        //enterUserName.init();
-        //ClientWindow clientWindow = new ClientWindow();
-        //clientWindow.init();
-        //run the client
-        ClientWindow cw = new ClientWindow();
-        cw.runClient();
+        try {
+            clientRun.setEnabled(false);
+            serverRun.setEnabled(false);
+            //this.setState(Frame.ICONIFIED);
+            this.dispose();
+            //EnterUserName enterUserName = new EnterUserName();
+            //enterUserName.init();
+            //ClientWindow clientWindow = new ClientWindow();
+            //clientWindow.init();
+            //run the client
+            ClientWindow cw = new ClientWindow();
+            cw.runClient();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(InitialWIndow.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(InitialWIndow.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_clientRunActionPerformed
 
     private void serverRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverRunActionPerformed

@@ -27,18 +27,21 @@ public class UnicastReceiver {
     private int PACKET_SIZE = 200;
     private byte[] buffer;
     private JButton receiverButton;
+    private ClientWindow parent;
     
-    public UnicastReceiver(String address, String port, JButton receiverButton) throws UnknownHostException, IOException
+    public UnicastReceiver(String address, String port, JButton receiverButton, ClientWindow parent) throws UnknownHostException, IOException
     {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         this.ia = InetAddress.getByName(address);
         this.port = Integer.parseInt(port);
+        this.datagramSocket = new DatagramSocket(this.port);
         this.receiverButton = receiverButton;
         System.out.println("In msReceiver constructor, ia = "+ia);
+        this.parent = parent;
         //this.datagramSocket = new MulticastSocket(this.port);
         //this.datagramPacket = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
-
     }
+    
     public byte[] receive() throws IOException, ClassNotFoundException {
 
             // get the InetAddress of the MCAST group 
@@ -51,18 +54,19 @@ public class UnicastReceiver {
             //MulticastSocket ms = new MulticastSocket(port);
 
             // create an empty datagram packet
-            //DatagramPacket dp = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
+            this.datagramPacket = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
 
             //Join a multicast group and wait for some action
             //ms.joinGroup(ia);
             
             try {
-            System.out.println("waiting for a packet from " + ia + "...");
+            //System.out.println("waiting for a packet from " + ia + "...");
+            parent.getChatArea().append("Waiting for unicast packet...");
             this.datagramSocket.receive(this.datagramPacket);
             byte[] data = this.datagramPacket.getData();
 
             // print out what we received and quit
-            System.out.println(new String(this.datagramPacket.getData()));
+            parent.getChatArea().append(new String(this.datagramPacket.getData()));
 
             //ms.leaveGroup(ia);
             //ms.close();

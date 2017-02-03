@@ -19,7 +19,7 @@ public class ServerHandling extends Thread {
 
     public ServerHandling() {
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.port = "443";
+        this.port = "4000";
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ServerHandling extends Thread {
             ms.receive(mainDP);
 
             // Print out what we received and quit
-            //System.out.println(new String(mainDP.getData()));
+            System.out.println(new String(mainDP.getData()));
             deserialize(CommandParser.determineType(mainDP.getData()).toString(), mainDP.getData());
         } catch (IOException e) {
             System.err.println(e.getMessage());
