@@ -19,7 +19,7 @@ public class ServerHandling extends Thread {
 
     public ServerHandling() {
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.port = "4000";
+        this.port = "443";
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ServerHandling extends Thread {
                 break;
             case "JOIN_CHATROOM_RESPONSE":
                 JoinChatroomResponse joinChatroomResponse = CommandParser.genJoinChatroomResponse(data);
-                SERVER.joinChatroomResponse(joinChatroomResponse);
+                SERVER.joinChatroomResponse(joinChatroomResponse, null, false);
                 break;
             default:
                 System.out.println("Unknown server command.");

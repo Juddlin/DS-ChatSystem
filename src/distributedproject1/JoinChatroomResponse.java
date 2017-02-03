@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class JoinChatroomResponse {
 
-    private int status;
+    private int status; // 1 for can join, 0 for cannot
     private String clientId;
     private String roomMulticastIp;
     private Date time;
