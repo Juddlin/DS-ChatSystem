@@ -3,16 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ChatMessage.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/JoinChatroomCommand.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ConnectResponse.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/GuiTest.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ConnectCommand.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/DistributedProject1.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ServerHandling.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ClientUpdateMessage.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/JoinChatroomResponse.java</file>
-            <file>file:/C:/Users/juddl/Documents/NetBeansProjects/DistributedProject1/src/distributedproject1/ChatRequest.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/InitialWIndow.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/CommandParser.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/ClientWindow.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/ChatRequest.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/ConnectResponse.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/JoinChatroomResponse.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/Tests.java</file>
+            <file>file:/Users/james/Library/Mobile%20Documents/com~apple~CloudDocs/CEG%207370%20Distributed%20Computing/DS-ChatSystem/src/distributedproject1/ClientUpdateMessage.java</file>
         </group>
     </open-files>
 </project-private>
