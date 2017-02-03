@@ -5,6 +5,7 @@
  */
 package distributedproject1;
 
+import java.awt.Color;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
@@ -28,32 +30,43 @@ public class ClientWindow extends javax.swing.JFrame {
      */
     public ClientWindow() {
         initComponents();
+
+        //initialCommunication();
     }
 
     public ClientWindow(String userName) throws IOException, ClassNotFoundException {
         this.userName = userName;
         initComponents();
-        
-        // send initial request to server
-        MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-        mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
-        byte[] response = mainServerReceiver.receive(serverPortIP);
-        ConnectResponse connectResponse;
-        listofrooms = new List();
-        usersInRoom = new List();
-        if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE)
-        {
-            connectResponse = CommandParser.genConnectResponse(response);
-            this.clientId = connectResponse.getClientId();
-            String[] rooms = connectResponse.getActiveChatroomNames();
-            for (String room : rooms){
-                listofrooms.add(room);
-            }
-        }
-        roomsList.add(listofrooms);
-        userList.add(usersInRoom);
-         
 
+    }
+
+    private void initialCommunication() throws ClassNotFoundException {
+        try {
+            // send initial request to server
+            MulticastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+            mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
+            byte[] response = mainServerReceiver.receive(serverPortIP);
+            ConnectResponse connectResponse;
+            listofrooms = new DefaultListModel();
+            usersInRoom = new DefaultListModel();
+            if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
+                connectResponse = CommandParser.genConnectResponse(response);
+                this.clientId = connectResponse.getClientId();
+                String[] rooms = connectResponse.getActiveChatroomNames();
+                for (String room : rooms) {
+                    listofrooms.addElement(room);
+                }
+            }
+            roomsList.removeAll();
+            userList.removeAll();
+            listofrooms.addElement("test1");
+            listofrooms.addElement("test2");
+            roomsList.setModel(listofrooms);
+            roomsList.updateUI();
+            userList.setModel(usersInRoom);
+        } catch (IOException ex) {
+            Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -91,16 +104,10 @@ public class ClientWindow extends javax.swing.JFrame {
         chatArea.setEditable(false);
         chatArea.setColumns(20);
         chatArea.setRows(5);
-        chatArea.setText("Hello, " + userName + "!\n");
         jScrollPane1.setViewportView(chatArea);
 
         roomsLabel.setText("Chat Rooms");
 
-        roomsList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(roomsList);
 
         joinRoomButton.setText("Join");
@@ -117,11 +124,6 @@ public class ClientWindow extends javax.swing.JFrame {
             }
         });
 
-        userList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane3.setViewportView(userList);
 
         userLabel.setText("Users");
@@ -191,21 +193,41 @@ public class ClientWindow extends javax.swing.JFrame {
     private void messageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_messageFieldActionPerformed
         // TODO add your handling code here:
         String message = messageField.getText();
-        chatArea.append(messageField.getText());
-        chatArea.append("\n");
+        //chatArea.append(messageField.getText());
+        //chatArea.append("\n");
         messageField.setText("");
-        ChatRequest cr = new ChatRequest(clientId, new Date(), message);
-        MulticastSender.send(serverPortIP, cr.toString());
+        if (roomMulticastIp != null) {
+            ChatRequest cr = new ChatRequest(clientId, new Date(), message);
+            String[] roomIpPort = {roomMulticastIp, serverPort};
+            MulticastSender.send(roomIpPort, cr.toString());
+        } else {
+            Color old = this.chatArea.getForeground();
+            this.chatArea.setForeground(Color.RED);
+            this.chatArea.append("Need to join a chatroom first\n");
+            this.chatArea.setForeground(old);
+        }
     }//GEN-LAST:event_messageFieldActionPerformed
 
     private void joinRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinRoomButtonActionPerformed
         // TODO add your handling code here:
         //get the room seleced in list
+        String room = roomsList.getSelectedValue();
+        if (room == null) {
+            Color old = this.chatArea.getForeground();
+            this.chatArea.setForeground(Color.RED);
+            this.chatArea.append("Please select a chatroom\n");
+            this.chatArea.setForeground(old);
+        } else {
+            String info = "Joining chatroom " + room + "\n";
+            this.chatArea.append(info);
+            joinChatroom(room);
+        }
     }//GEN-LAST:event_joinRoomButtonActionPerformed
 
     private void createRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createRoomButtonActionPerformed
         // open new dialog window for user to enter room name
         //Object[] possibilities = {"ham", "spam", "yam"};
+        this.setFocusableWindowState(false);
         String newRoom = (String) JOptionPane.showInputDialog(
                 this,
                 "Enter new room name:",
@@ -214,11 +236,12 @@ public class ClientWindow extends javax.swing.JFrame {
 
         //If a string was returned, say so.
         if ((newRoom != null) && (newRoom.length() > 0)) {
+            String info = "Creating new chatroom: "+newRoom+"\n";
+            this.chatArea.append(info);
             joinChatroom(newRoom);
         }
-
         //If you're here, the return value was null/empty.
-
+        this.setFocusableWindowState(true);
     }//GEN-LAST:event_createRoomButtonActionPerformed
 
     private void joinChatroom(String room) {
@@ -250,7 +273,7 @@ public class ClientWindow extends javax.swing.JFrame {
         }
     }
 
-    public void runClient() {
+    public void runClient_OLD() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -282,13 +305,57 @@ public class ClientWindow extends javax.swing.JFrame {
         });
     }
 
+    public void runClient() {
+        this.setVisible(true);
+        while (userName == null) {
+            getUsername();
+        }
+
+        listofrooms = new DefaultListModel();
+        usersInRoom = new DefaultListModel();
+        roomsList.removeAll();
+        userList.removeAll();
+        listofrooms.addElement("test1");
+        listofrooms.addElement("test2");
+        usersInRoom.addElement("test3");
+        usersInRoom.addElement("test4");
+        roomsList.setModel(listofrooms);
+        //roomsList.updateUI();
+        userList.setModel(usersInRoom);
+        //initialCommunication();
+    }
+
+    private void getUsername() {
+        this.setFocusableWindowState(false);
+        String userName = (String) JOptionPane.showInputDialog(
+                this,
+                "Enter user name:",
+                "Customized Dialog",
+                JOptionPane.PLAIN_MESSAGE);
+
+        //If a string was returned, say so.
+        if ((userName != null) && (userName.length() > 0)) {
+            this.userName = userName;
+            String greeting = "Hello, " + userName + "!\nSelect join or create a chatroom\n";
+            this.chatArea.setText(greeting);
+
+        } else {
+            Color old = this.chatArea.getForeground();
+            this.chatArea.setForeground(Color.RED);
+            this.chatArea.append("Invalid username!\n");
+            this.chatArea.setForeground(old);
+        }
+        //If you're here, the return value was null/empty.
+        this.setFocusableWindowState(true);
+    }
+
     private String userName;
     private String clientId;
     private String roomMulticastIp;
     private MulticastReceiver mainServerReceiver;
     private MulticastReceiver chatroomReceiver;
-    private List listofrooms;
-    private List usersInRoom;
+    private DefaultListModel<String> listofrooms;
+    private DefaultListModel<String> usersInRoom;
     private String serverIP = "224.0.0.251";
     private String serverPort = "4000";
     private String[] serverPortIP = {serverIP, serverPort};
@@ -313,7 +380,24 @@ public class ClientWindow extends javax.swing.JFrame {
             switch (CommandParser.determineType(message)) {
                 case CHAT_MESSAGE:
                     ChatMessage cm = CommandParser.genChatMessage(message);
+                    chatArea.append(cm.getSenderName());
+                    chatArea.append(cm.getTime().toString());
                     chatArea.append(cm.getMessage());
+                    chatArea.append("\n");
+                    break;
+                case CLIENT_UPDATE_MESSAGE:
+                    ClientUpdateMessage cum = CommandParser.genClientUpdateMessage(message);
+                    String[] names = cum.getNames();
+                    if (cum.getUpdateType() == 0) {
+                        for (String name : names) {
+                            usersInRoom.addElement(name);
+                        }
+                    } else if (cum.getUpdateType() == 1) {
+                        for (String name : names) {
+                            usersInRoom.removeElement(name);
+                        }
+                    }
+                    userList.setListData(names);
                     break;
                 default:
                     chatArea.append(new String(message));
