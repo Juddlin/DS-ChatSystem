@@ -14,12 +14,12 @@ import java.net.MulticastSocket;
 public class ServerHandling extends Thread {
 
     private String mCastAddressMainAddress;
-    private String IPAddress;
-    private static final CommandParser PARSER = new CommandParser();
+    private String port;
+    private static final Server SERVER = new Server();
 
     public ServerHandling() {
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.IPAddress = "443";
+        this.port = "443";
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ServerHandling extends Thread {
             InetAddress ia = InetAddress.getByName(this.mCastAddressMainAddress);
 
             // Get the port that we will be listening on
-            int port = Integer.parseInt(this.IPAddress);
+            int port = Integer.parseInt(this.port);
 
             // Create a multicast socket on the specified local port number
             MulticastSocket ms = new MulticastSocket(port);
@@ -60,26 +60,34 @@ public class ServerHandling extends Thread {
         switch (type) {
             case "CHAT_MESSAGE":
                 ChatMessage chatMessage = CommandParser.genChatMessage(data);
+                SERVER.chatMessage(chatMessage);
                 break;
             case "CHAT_REQUEST":
                 ChatRequest chatRequest = CommandParser.genChatRequest(data);
+                SERVER.chatRequest(chatRequest);
                 break;
             case "CLIENT_UPDATE_MESSAGE":
                 ClientUpdateMessage updateMessage = CommandParser.genClientUpdateMessage(data);
+                SERVER.clientUpdateMessage(updateMessage);
                 break;
             case "CONNECT_COMMAND":
                 ConnectCommand connectCommand = CommandParser.genConnectCommand(data);
+                SERVER.connectCommand(connectCommand);
                 break;
             case "CONNECT_RESPONSE":
                 ConnectResponse connectResponse = CommandParser.genConnectResponse(data);
+                SERVER.connectResponse(connectResponse);
                 break;
             case "JOIN_CHATROOM_COMMAND":
                 JoinChatroomCommand joinChatroomCommand = CommandParser.genJoinChatroomCommand(data);
+                SERVER.joinChatroomCommand(joinChatroomCommand);
                 break;
             case "JOIN_CHATROOM_RESPONSE":
                 JoinChatroomResponse joinChatroomResponse = CommandParser.genJoinChatroomResponse(data);
+                SERVER.joinChatroomResponse(joinChatroomResponse);
                 break;
             default:
+                System.out.println("Unknown server command.");
                 break;
         }
     }
