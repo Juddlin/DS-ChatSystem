@@ -60,7 +60,7 @@ public class ServerHandling extends Thread {
         switch (type) {
             case "CHAT_MESSAGE":
                 ChatMessage chatMessage = CommandParser.genChatMessage(data);
-                SERVER.chatMessage(chatMessage);
+                SERVER.chatMessage(chatMessage, mCastAddressMainAddress);
                 break;
             case "CHAT_REQUEST":
                 ChatRequest chatRequest = CommandParser.genChatRequest(data);

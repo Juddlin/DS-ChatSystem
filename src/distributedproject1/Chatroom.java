@@ -10,14 +10,16 @@ import java.util.ArrayList;
  */
 public class Chatroom {
     
-    private ArrayList<String> users;
+    private ArrayList<User> users;
     private String chatroomName;
     private String multiCastAddress;
+    private int currentMessageId;
     
     public Chatroom(String chatroomName, String multiCastAddress) {
         this.users = new ArrayList<>();
         this.chatroomName = chatroomName;
         this.multiCastAddress = multiCastAddress;
+        this.currentMessageId = 1;
     }
     
     public String getChatroomName() {
@@ -36,12 +38,28 @@ public class Chatroom {
         this.multiCastAddress = multiCastAddress;
     }
     
-    public void addUserToChatroom(String user) {
+    public ArrayList<User> getUsers(){
+        return this.users;
+    }
+    
+    public void addUserToChatroom(User user) {
         this.users.add(user);
     }
     
-    public void removeUserFromChatroom(String user) {
+    public void removeUserFromChatroom(User user) {
         this.users.remove(user);
+    }
+    
+    public int getMessageId() {
+        return this.currentMessageId;
+    }
+    
+    public void setMessageId(int currentMessageId) {
+        this.currentMessageId = currentMessageId;
+    }
+    
+    public void incrementMessageId(){
+        this.currentMessageId++;
     }
     
 }
