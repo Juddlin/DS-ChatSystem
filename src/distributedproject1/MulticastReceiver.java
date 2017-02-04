@@ -42,7 +42,7 @@ public class MulticastReceiver implements Runnable {
         this.port = Integer.parseInt(port);
         this.receiverButton = receiverButton;
         this.clientOutput = clientOutput;
-        System.out.println("In msReceiver constructor, ia = "+ia);
+        clientOutput.append("In msReceiver constructor, ia = "+ia + "\n");
         //this.ms = new MulticastSocket(this.port);
         //this.dp = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
 
@@ -71,15 +71,15 @@ public class MulticastReceiver implements Runnable {
             ms.joinGroup(iaa);
                         //ms.setLoopbackMode(true);
 
-            System.out.println("waiting for a packet from " + ia + "...");
+            clientOutput.append("waiting for a packet from " + ia + "...\n");
             ms.receive(dp);
             byte[] data = dp.getData();
 
             // print out what we received and quit
-            System.out.println(new String(dp.getData()));
+            clientOutput.append(new String(dp.getData()) + "\n");
 
-            ms.leaveGroup(ia);
-            ms.close();
+            //ms.leaveGroup(ia);
+            //ms.close();
             return data;
 
         } catch (IOException e) {
