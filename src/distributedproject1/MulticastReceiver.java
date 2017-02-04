@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javax.swing.JButton;
+import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 
 //Usage: java MulticastReceiver ALL-SYSTEMS.MCAST.NET 4000
@@ -31,14 +32,16 @@ public class MulticastReceiver implements Runnable {
     private byte[] buffer;
     private JButton receiverButton;
     private String address;
+    JTextArea clientOutput;
     
-    public MulticastReceiver(String address, String port, JButton receiverButton) throws UnknownHostException, IOException
+    public MulticastReceiver(String address, String port, JButton receiverButton, JTextArea clientOutput) throws UnknownHostException, IOException
     {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         this.ia = InetAddress.getByName(address);
         this.address = address;
         this.port = Integer.parseInt(port);
         this.receiverButton = receiverButton;
+        this.clientOutput = clientOutput;
         System.out.println("In msReceiver constructor, ia = "+ia);
         //this.ms = new MulticastSocket(this.port);
         //this.dp = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);

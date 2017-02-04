@@ -62,7 +62,7 @@ public class ClientWindow extends javax.swing.JFrame {
         byte[] response;
 
         try {
-            mainServerReceiver = new MulticastReceiver(this.serverIP, this.localPort, null);
+            mainServerReceiver = new MulticastReceiver(this.serverIP, this.localPort, null, this.chatArea);
             this.chatArea.append("Waiting for response from server...\n");
             // send initial request to server
             UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
@@ -304,7 +304,7 @@ public class ClientWindow extends javax.swing.JFrame {
                     JButton receiverButton = new JButton();
                     receiverButton.setVisible(false);
                     this.roomMulticastIp = jcr.getRoomMulticastIp();
-                    chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton);
+                    chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton, this.chatArea);
                     receiverButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
