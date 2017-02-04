@@ -70,13 +70,13 @@ public class ClientWindow extends javax.swing.JFrame {
             if (response != null) {
                 if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
                     connectResponse = CommandParser.genConnectResponse(response);
-                    System.out.println("connectResponse status: " + connectResponse.getStatus());
+                    this.chatArea.append("connectResponse status: " + connectResponse.getStatus() + "\n");
                 } else {
-                    System.out.println("connectResponse not received");
+                    this.chatArea.append("connectResponse not received\n");
                     return;
                 }
             } else {
-                System.out.println("response was null");
+                this.chatArea.append("response was null");
                 return;
             }
 //            while (connectResponse.getStatus() != 1 || response == null) {
@@ -100,7 +100,7 @@ public class ClientWindow extends javax.swing.JFrame {
         }
         roomsList.setModel(listofrooms);
         userList.setModel(usersInRoom);
-        this.chatArea.append("Connection sucessful, clientId: " + this.clientId);
+        this.chatArea.append("Connection sucessful, clientId: " + this.clientId + "\n");
         sucessfulConnection = true;
     }
 
@@ -274,6 +274,8 @@ public class ClientWindow extends javax.swing.JFrame {
             String info = "Creating new chatroom: " + newRoom + "\n";
             this.chatArea.append(info);
             joinChatroom(newRoom);
+        } else {
+            this.chatArea.append("Invalid room entered\n");
         }
         this.setFocusableWindowState(true);
     }//GEN-LAST:event_createRoomButtonActionPerformed
@@ -296,7 +298,10 @@ public class ClientWindow extends javax.swing.JFrame {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date(), 1);
             UnicastSender.send(serverPortIP, jcc.toString());
             byte[] response = mainServerReceiver.receive();
-            
+            if (response == null)
+            {
+                this.chatArea.append("joinChatroomResponse was null\n");     
+            }
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
@@ -304,6 +309,7 @@ public class ClientWindow extends javax.swing.JFrame {
                     JButton receiverButton = new JButton();
                     receiverButton.setVisible(false);
                     this.roomMulticastIp = jcr.getRoomMulticastIp();
+                    this.chatArea.append("IP for chatroom is " + this.roomMulticastIp + "\n");
                     chatroomReceiver = new MulticastReceiver(jcr.getRoomMulticastIp(), serverPort, receiverButton, this.chatArea);
                     receiverButton.addActionListener(new ActionListener() {
                         @Override
@@ -457,9 +463,19 @@ public class ClientWindow extends javax.swing.JFrame {
                     }
                     //userList.setListData(names);
                     break;
+                case CHAT_REQUEST:
+                    break;
+                case CONNECT_COMMAND:
+                    break;
+                case CONNECT_RESPONSE:
+                    break;
+                case JOIN_CHATROOM_COMMAND:
+                    break;
+                case JOIN_CHATROOM_RESPONSE:
+                    break;
                 default:
-                    chatArea.append(new String(message));
-                    System.out.println("Invalid message");
+                    chatArea.append(new String(message) + "\n");
+                    chatArea.append("Invalid message from server\n");
             }
         } else {
             chatArea.append(new String(message));
