@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 
 /**
  * Class handles the inner workings of the server.
@@ -14,12 +15,20 @@ import java.net.MulticastSocket;
 public class ServerHandling extends Thread {
 
     private String mCastAddressMainAddress;
-    private String port;
+    private int port;
     private static final Server SERVER = new Server();
+    private InetAddress ia;
+    private MulticastSocket ms;
 
     public ServerHandling() {
         this.mCastAddressMainAddress = "239.255.255.255";
-        this.port = "443";
+        this.port = 443;
+        try {
+            this.ia = InetAddress.getByName(this.mCastAddressMainAddress);
+        } catch (IOException e) {
+            System.out.println("HIT HIT HIT");
+        }
+        
     }
 
     @Override
@@ -31,28 +40,22 @@ public class ServerHandling extends Thread {
 
     private void listen() {
         try {
-            // Get the InetAddress of the MCAST group 
-            InetAddress ia = InetAddress.getByName(this.mCastAddressMainAddress);
-
-            // Get the port that we will be listening on
-            int port = Integer.parseInt(this.port);
-
-            // Create a multicast socket on the specified local port number
-            MulticastSocket ms = new MulticastSocket(port);
-
             // Create an empty datagram packet
             DatagramPacket mainDP = new DatagramPacket(new byte[128], 128);
-
+            this.ms = new MulticastSocket(port);
+            
             // Join a multicast group and wait for some action
             // THIS NEEDS TO BE SLPIT APART, JOINING A GROUP AND RECEIVING IS HAPPENING SIMULTANEOUSLY HERE
             ms.joinGroup(ia);
+            System.out.println("before receive in listener");
             ms.receive(mainDP);
+            System.out.println("after receive in listener");
 
             // Print out what we received and quit
             System.out.println(new String(mainDP.getData()));
             deserialize(CommandParser.determineType(mainDP.getData()).toString(), mainDP.getData());
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -34,8 +34,8 @@ public class ClientWindow extends javax.swing.JFrame {
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
     private String serverIP = "239.255.255.255";
-    private String serverPort = "4000";
-    private String localPort = "4000";
+    private String serverPort = "443";
+    private String localPort = "443";
     private String[] serverPortIP = {serverIP, serverPort};
     private String currentChatroom;
     private boolean sucessfulConnection;

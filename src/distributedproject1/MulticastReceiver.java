@@ -30,11 +30,13 @@ public class MulticastReceiver implements Runnable {
     private int PACKET_SIZE = 200;
     private byte[] buffer;
     private JButton receiverButton;
+    private String address;
     
     public MulticastReceiver(String address, String port, JButton receiverButton) throws UnknownHostException, IOException
     {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         this.ia = InetAddress.getByName(address);
+        this.address = address;
         this.port = Integer.parseInt(port);
         this.receiverButton = receiverButton;
         System.out.println("In msReceiver constructor, ia = "+ia);
@@ -52,7 +54,7 @@ public class MulticastReceiver implements Runnable {
 
             // get the InetAddress of the MCAST group 
             //InetAddress ia = InetAddress.getByName(argv[0]);
-
+            InetAddress iaa = InetAddress.getByName(this.address);
             // get the port that we will be listening on
             //int port = Integer.parseInt(argv[1]);
 
@@ -63,8 +65,8 @@ public class MulticastReceiver implements Runnable {
             DatagramPacket dp = new DatagramPacket(new byte[167], 167);
 
             //Join a multicast group and wait for some action
-            ms.joinGroup(ia);
-                        ms.setLoopbackMode(true);
+            ms.joinGroup(iaa);
+                        //ms.setLoopbackMode(true);
 
             System.out.println("waiting for a packet from " + ia + "...");
             ms.receive(dp);
