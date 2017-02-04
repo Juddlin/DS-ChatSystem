@@ -27,7 +27,7 @@ public class Server {
         this.chatrooms = new ArrayList<>();
         this.users = new ArrayList<>();
         this.currentClientId = 1;
-        this.mCastAddressMainAddress = NetworkingConst.ADDRESS;
+        this.mCastAddressMainAddress = NetworkingConst.MULTI_ADDRESS;
         this.startingMCastAddress = "239.255.255.";
         this.mCastConcat = 201;
         this.port = NetworkingConst.PORT_STR;

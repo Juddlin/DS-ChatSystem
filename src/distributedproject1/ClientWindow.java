@@ -33,7 +33,7 @@ public class ClientWindow extends javax.swing.JFrame {
     private MulticastReceiver chatroomReceiver;
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
-    private String serverIP = NetworkingConst.ADDRESS;
+    private String serverIP = NetworkingConst.UNI_ADDRESS;
     private String serverPort = NetworkingConst.PORT_STR;
     private String localPort = NetworkingConst.PORT_STR;
     private String[] serverPortIP = {serverIP, serverPort};

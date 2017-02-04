@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class handles the inner workings of the server.
@@ -21,7 +23,7 @@ public class ServerHandling extends Thread {
     private MulticastSocket ms;
 
     public ServerHandling() {
-        this.mCastAddressMainAddress = NetworkingConst.ADDRESS;
+        this.mCastAddressMainAddress = NetworkingConst.MULTI_ADDRESS;
         this.port = NetworkingConst.PORT_INT;
         try {
             this.ia = InetAddress.getByName(this.mCastAddressMainAddress);
@@ -54,8 +56,11 @@ public class ServerHandling extends Thread {
             // Print out what we received and quit
             System.out.println(new String(mainDP.getData()));
             deserialize(CommandParser.determineType(mainDP.getData()).toString(), mainDP.getData());
+            Thread.sleep(1000);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ServerHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

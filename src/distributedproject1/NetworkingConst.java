@@ -10,7 +10,8 @@ package distributedproject1;
  * @author james
  */
 public class NetworkingConst {
-    public static final String PORT_STR = "4000";
-    public static final int PORT_INT = 4000;
-    public static final String ADDRESS = "239.255.255.255";
+    public static final String PORT_STR = "6789";
+    public static final int PORT_INT = 6789;
+    public static final String UNI_ADDRESS = "127.0.0.1";
+    public static final String MULTI_ADDRESS = "239.255.255.255";
 }
