@@ -33,9 +33,9 @@ public class ClientWindow extends javax.swing.JFrame {
     private MulticastReceiver chatroomReceiver;
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
-    private String serverIP = "239.255.255.255";
-    private String serverPort = "443";
-    private String localPort = "443";
+    private String serverIP = NetworkingConst.ADDRESS;
+    private String serverPort = NetworkingConst.PORT_STR;
+    private String localPort = NetworkingConst.PORT_STR;
     private String[] serverPortIP = {serverIP, serverPort};
     private String currentChatroom;
     private boolean sucessfulConnection;
@@ -300,7 +300,8 @@ public class ClientWindow extends javax.swing.JFrame {
             byte[] response = mainServerReceiver.receive();
             if (response == null)
             {
-                this.chatArea.append("joinChatroomResponse was null\n");     
+                this.chatArea.append("joinChatroomResponse was null\n");   
+                return;
             }
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);

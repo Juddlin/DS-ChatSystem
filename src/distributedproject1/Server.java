@@ -27,10 +27,10 @@ public class Server {
         this.chatrooms = new ArrayList<>();
         this.users = new ArrayList<>();
         this.currentClientId = 1;
-        this.mCastAddressMainAddress = "239.255.255.255";
+        this.mCastAddressMainAddress = NetworkingConst.ADDRESS;
         this.startingMCastAddress = "239.255.255.";
         this.mCastConcat = 201;
-        this.port = "443";
+        this.port = NetworkingConst.PORT_STR;
     }
     
     public void chatMessage(ChatMessage message, String mCastAddress) {

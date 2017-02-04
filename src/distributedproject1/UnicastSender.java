@@ -52,7 +52,7 @@ public class UnicastSender {
 
 			// tidy up - leave the group and close the socket
 			//ms.leaveGroup(ia);
-			ds.close();
+			//ds.close();
 		} 
 		catch (IOException e) {
 			System.err.println(e.getMessage());

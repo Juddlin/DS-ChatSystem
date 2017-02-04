@@ -21,8 +21,8 @@ public class ServerHandling extends Thread {
     private MulticastSocket ms;
 
     public ServerHandling() {
-        this.mCastAddressMainAddress = "239.255.255.255";
-        this.port = 443;
+        this.mCastAddressMainAddress = NetworkingConst.ADDRESS;
+        this.port = NetworkingConst.PORT_INT;
         try {
             this.ia = InetAddress.getByName(this.mCastAddressMainAddress);
         } catch (IOException e) {
