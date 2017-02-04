@@ -32,6 +32,7 @@ public class MulticastReceiver implements Runnable {
     private byte[] buffer;
     private JButton receiverButton;
     private String address;
+    private Queue<byte[]> byteBuffer;
     JTextArea clientOutput;
     
     public MulticastReceiver(String address, String port, JButton receiverButton, JTextArea clientOutput) throws UnknownHostException, IOException
@@ -42,11 +43,12 @@ public class MulticastReceiver implements Runnable {
         this.port = Integer.parseInt(port);
         this.receiverButton = receiverButton;
         this.clientOutput = clientOutput;
+        this.byteBuffer = new ArrayDeque();
         clientOutput.append("In msReceiver constructor, ia = "+ia + "\n");
         //this.ms = new MulticastSocket(this.port);
         //this.dp = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
-
     }
+    
     public byte[] receive() throws IOException, ClassNotFoundException {
         try {
 //            if (2 != argv.length) {
@@ -92,32 +94,24 @@ public class MulticastReceiver implements Runnable {
     @Override
     public void run() {
         ms = null;
-        try {
             clientOutput.append("Setting up multicast receiver\n");
-            this.ms = new MulticastSocket(this.port);
-            this.ms.joinGroup(this.ia);
-        } catch (IOException ex) {
-            Logger.getLogger(MulticastReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        clientOutput.append("Multicast receiver set up\n");
+            //this.ms = new MulticastSocket(this.port);
+            //this.ms.joinGroup(this.ia);
+
+//        clientOutput.append("Multicast receiver set up\n");
         while (true) {
             try {
                 this.buffer = new byte[PACKET_SIZE];
                 this.dp = new DatagramPacket(buffer, buffer.length);
                 this.ms = new MulticastSocket(port);
+                this.ms.joinGroup(this.ia);
+                clientOutput.append("multicast socket waiting...\n");
                 this.ms.receive(this.dp);
                 this.buffer = this.dp.getData();
-                clientOutput.append("socket received: "+new String(buffer) + "\n");
+                clientOutput.append("the socket received: "+new String(buffer) + "\n");
             } catch (IOException ex) {
                 Logger.getLogger(MulticastReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }
-//            try {
-//                ms.leaveGroup(ia);
-//            } catch (IOException ex) {
-//                Logger.getLogger(MulticastReceiver.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            ms.close();
-//            ChangeEvent e = new ChangeEvent(this);
               receiverButton.doClick();
         }
     }
