@@ -319,6 +319,9 @@ public class ClientWindow extends javax.swing.JFrame {
                     });
                     new Thread(chatroomReceiver, "MulticastReceiver").start();
 
+                } else
+                {
+                    this.chatArea.append("clientID of response was not the same as mine\n");
                 }
             }
         } catch (IOException ex) {
@@ -427,7 +430,7 @@ public class ClientWindow extends javax.swing.JFrame {
 
     private void messageReceived() {
 
-        byte[] message = mainServerReceiver.getBuffer();
+        byte[] message = chatroomReceiver.getBuffer();
         if (CommandParser.determineType(message) != null) {
             switch (CommandParser.determineType(message)) {
                 case CHAT_MESSAGE:
