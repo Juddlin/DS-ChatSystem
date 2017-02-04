@@ -93,20 +93,21 @@ public class MulticastReceiver implements Runnable {
     public void run() {
         ms = null;
         try {
-            System.out.println("Setting up multicast receiver");
+            clientOutput.append("Setting up multicast receiver\n");
             this.ms = new MulticastSocket(this.port);
             this.ms.joinGroup(this.ia);
         } catch (IOException ex) {
             Logger.getLogger(MulticastReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("Multicast receiver set up");
+        clientOutput.append("Multicast receiver set up\n");
         while (true) {
             try {
                 this.buffer = new byte[PACKET_SIZE];
                 this.dp = new DatagramPacket(buffer, buffer.length);
+                this.ms = new MulticastSocket(port);
                 this.ms.receive(this.dp);
                 this.buffer = this.dp.getData();
-                System.out.println(new String(buffer));
+                clientOutput.append("socket received: "+new String(buffer) + "\n");
             } catch (IOException ex) {
                 Logger.getLogger(MulticastReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -118,8 +119,6 @@ public class MulticastReceiver implements Runnable {
 //            ms.close();
 //            ChangeEvent e = new ChangeEvent(this);
               receiverButton.doClick();
-
-            
         }
     }
 
