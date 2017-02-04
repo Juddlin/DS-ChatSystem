@@ -29,7 +29,7 @@ public class Server {
         this.currentClientId = 1;
         this.mCastAddressMainAddress = "239.255.255.255";
         this.startingMCastAddress = "239.255.255.";
-        this.mCastConcat = 1;
+        this.mCastConcat = 201;
         this.port = "443";
     }
     
@@ -196,7 +196,6 @@ public class Server {
             ClientUpdateMessage message = new ClientUpdateMessage(1, nameList.toArray(new String[0]));
             clientUpdateMessage(message);
         } else {
-            // need to add an if-else here for whether it is a join or leave command.
             boolean flag = false;
             int i = 0;
             // Check if chatroom exists alraedy
@@ -240,12 +239,13 @@ public class Server {
                 } else {
                     for (User user : this.users) {
                         if (user.getUserName().equals(command.getUsername())) {
+                            Chatroom chatroom = new Chatroom(command.getChatroomName(), responseMCastAddress);
+                            this.chatrooms.add(chatroom);
                             responseMCastAddress = this.startingMCastAddress + Integer.toString(this.mCastConcat);
+                            System.out.println("THE MCAST ADDRESS = " + responseMCastAddress);
                             this.mCastConcat++;
                             tempList = this.chatrooms.get(i).getUsers();
                             tempClientID = user.getClientId();
-                            Chatroom chatroom = new Chatroom(command.getChatroomName(), responseMCastAddress);
-                            this.chatrooms.add(chatroom);
                             
                             ArrayList<String> roomNames = new ArrayList<>();
                             for (int j = 0; j < this.chatrooms.size(); j++) {

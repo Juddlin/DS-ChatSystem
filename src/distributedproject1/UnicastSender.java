@@ -26,13 +26,15 @@ public class UnicastSender {
 				System.err.println(" e.g.: java MulticastSender ALL-SYSTEMS.MCAST.NET 4000");
 				System.exit(1);
 			}
-
+                        
+                        System.out.println("argv[0] = " + argv[0]);
 			// get the InetAddress of the MCAST group 
 			InetAddress ia = InetAddress.getByName( argv[0] );
 
 			// get the port that the MCAST group members will be listening on
+                        System.out.println("argv[1] = " + argv[1]);
 			int recvPort = Integer.parseInt( argv[1] );
-
+                         
 			// create a datagram with a suitable message
 			//String str = "Hello from: "+InetAddress.getLocalHost();
 			byte[] data = str.getBytes();

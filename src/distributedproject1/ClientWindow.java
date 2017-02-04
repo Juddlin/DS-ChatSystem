@@ -296,7 +296,7 @@ public class ClientWindow extends javax.swing.JFrame {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date(), 1);
             UnicastSender.send(serverPortIP, jcc.toString());
             byte[] response = mainServerReceiver.receive();
-
+            
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
