@@ -36,7 +36,7 @@ public class UnicastReceiver {
         this.port = Integer.parseInt(port);
         this.datagramSocket = new DatagramSocket(this.port);
         this.receiverButton = receiverButton;
-        System.out.println("In msReceiver constructor, ia = "+ia);
+        System.out.println("In Unicast Receiver constructor, ia = "+ia);
         this.parent = parent;
         //this.datagramSocket = new MulticastSocket(this.port);
         //this.datagramPacket = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);

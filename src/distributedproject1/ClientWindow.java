@@ -34,9 +34,11 @@ public class ClientWindow extends javax.swing.JFrame {
     private DefaultListModel<String> listofrooms;
     private DefaultListModel<String> usersInRoom;
     private String serverIP = "239.255.255.255";
-    private String serverPort = "443";
+    private String serverPort = "4000";
+    private String localPort = "4000";
     private String[] serverPortIP = {serverIP, serverPort};
     private String currentChatroom;
+    private boolean sucessfulConnection;
 
     /**
      * Creates new form ClientWindow
@@ -60,32 +62,46 @@ public class ClientWindow extends javax.swing.JFrame {
         byte[] response;
 
         try {
-            mainServerReceiver = new MulticastReceiver(this.serverIP, this.serverPort, null);
+            mainServerReceiver = new MulticastReceiver(this.serverIP, this.localPort, null);
             this.chatArea.append("Waiting for response from server...\n");
             // send initial request to server
             UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-            response = mainServerReceiver.receive(this.serverPortIP);
-            while (connectResponse.getStatus() != 1) {
+            response = mainServerReceiver.receive();
+            if (response != null) {
                 if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
                     connectResponse = CommandParser.genConnectResponse(response);
-                    //resend connect command
-                    UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
-                    //mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
-                    response = mainServerReceiver.receive(this.serverPortIP);
+                    System.out.println("connectResponse status: " + connectResponse.getStatus());
+                } else {
+                    System.out.println("connectResponse not received");
+                    return;
                 }
+            } else {
+                System.out.println("response was null");
+                return;
             }
+//            while (connectResponse.getStatus() != 1 || response == null) {
+//                if (CommandParser.determineType(response) == CommandType.CONNECT_RESPONSE) {
+//                    connectResponse = CommandParser.genConnectResponse(response);
+//                    //resend connect command
+//                    UnicastSender.send(serverPortIP, new ConnectCommand(this.userName, new Date()).toString());
+//                    //mainServerReceiver = new UnicastReceiver(this.serverIP, this.serverPort, null);
+//                    response = mainServerReceiver.receive(this.serverPortIP);
+//                }
+//            }
         } catch (IOException ex) {
             Logger.getLogger(ClientWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.clientId = connectResponse.getClientId();
         String[] rooms = connectResponse.getActiveChatroomNames();
-        for (String room : rooms) {
-            listofrooms.addElement(room);
+        if (rooms != null) {
+            for (String room : rooms) {
+                listofrooms.addElement(room);
+            }
         }
-
         roomsList.setModel(listofrooms);
         userList.setModel(usersInRoom);
         this.chatArea.append("Connection sucessful, clientId: " + this.clientId);
+        sucessfulConnection = true;
     }
 
     /**
@@ -161,11 +177,10 @@ public class ClientWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                        .addComponent(createRoomButton)
-                        .addComponent(joinRoomButton)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(joinRoomButton)
+                    .addComponent(createRoomButton)
                     .addComponent(leaveRoomButton))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -264,12 +279,14 @@ public class ClientWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_createRoomButtonActionPerformed
 
     private void leaveRoomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leaveRoomButtonActionPerformed
-        if (this.roomMulticastIp != null)
-        {
+        if (this.roomMulticastIp != null) {
             UnicastSender.send(serverPortIP, new JoinChatroomCommand(this.userName, this.currentChatroom, new Date(), 0).toString());
             this.roomMulticastIp = null;
             this.currentChatroom = null;
             this.chatArea.append("Chatroom left\n");
+            this.createRoomButton.setEnabled(true);
+            this.joinRoomButton.setEnabled(true);
+            this.leaveRoomButton.setEnabled(false);
         }
 
     }//GEN-LAST:event_leaveRoomButtonActionPerformed
@@ -278,7 +295,8 @@ public class ClientWindow extends javax.swing.JFrame {
         try {
             JoinChatroomCommand jcc = new JoinChatroomCommand(userName, room, new Date(), 1);
             UnicastSender.send(serverPortIP, jcc.toString());
-            byte[] response = mainServerReceiver.receive(this.serverPortIP);
+            byte[] response = mainServerReceiver.receive();
+
             if (CommandParser.determineType(response) == CommandType.JOIN_CHATROOM_RESPONSE) {
                 JoinChatroomResponse jcr = CommandParser.genJoinChatroomResponse(response);
                 if (jcr.getClientId().equals(this.clientId)) {
@@ -306,6 +324,9 @@ public class ClientWindow extends javax.swing.JFrame {
                     .getName()).log(Level.SEVERE, null, ex);
         }
         this.currentChatroom = room;
+        this.createRoomButton.setEnabled(false);
+        this.joinRoomButton.setEnabled(false);
+        this.leaveRoomButton.setEnabled(true);
     }
 
     public void runClient_OLD() {
@@ -349,6 +370,7 @@ public class ClientWindow extends javax.swing.JFrame {
     }
 
     public void runClient() throws ClassNotFoundException, IOException {
+        this.leaveRoomButton.setEnabled(false);
         this.setVisible(true);
         while (userName == null) {
             getUsername();
@@ -367,7 +389,10 @@ public class ClientWindow extends javax.swing.JFrame {
         //roomsList.updateUI();
         userList.setModel(usersInRoom);
          */
-        initialCommunication();
+        sucessfulConnection = false;
+        while (!sucessfulConnection) {
+            initialCommunication();
+        }
     }
 
     private void getUsername() {
@@ -419,17 +444,14 @@ public class ClientWindow extends javax.swing.JFrame {
                             usersInRoom.removeElement(name);
                         }
                     }*/
-                    if ( cum.getUpdateType() == 1 || cum.getUpdateType() == 0)
-                    {
+                    if (cum.getUpdateType() == 1 || cum.getUpdateType() == 0) {
                         usersInRoom.clear();
-                        for (String user: cum.getNames())
-                        {
+                        for (String user : cum.getNames()) {
                             usersInRoom.addElement(user);
                         }
-                    } else if (cum.getUpdateType() == 2)
-                    {
+                    } else if (cum.getUpdateType() == 2) {
                         listofrooms.clear();
-                        for (String room: cum.getNames()){
+                        for (String room : cum.getNames()) {
                             listofrooms.addElement(room);
                         }
                     }
@@ -444,8 +466,7 @@ public class ClientWindow extends javax.swing.JFrame {
         }
     }
 
-    public javax.swing.JTextArea getChatArea()
-    {
+    public javax.swing.JTextArea getChatArea() {
         return this.chatArea;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

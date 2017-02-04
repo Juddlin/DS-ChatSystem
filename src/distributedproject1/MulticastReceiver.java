@@ -42,19 +42,19 @@ public class MulticastReceiver implements Runnable {
         //this.dp = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
 
     }
-    public byte[] receive(String[] argv) throws IOException, ClassNotFoundException {
+    public byte[] receive() throws IOException, ClassNotFoundException {
         try {
-            if (2 != argv.length) {
-                System.err.println("Usage: java MulticastReceiver <address> <port>");
-                System.err.println(" e.g.: java MulticastReceiver ALL-SYSTEMS.MCAST.NET 4000");
-                System.exit(1);
-            }
+//            if (2 != argv.length) {
+//                System.err.println("Usage: java MulticastReceiver <address> <port>");
+//                System.err.println(" e.g.: java MulticastReceiver ALL-SYSTEMS.MCAST.NET 4000");
+//                System.exit(1);
+//            }
 
             // get the InetAddress of the MCAST group 
-            InetAddress ia = InetAddress.getByName(argv[0]);
+            //InetAddress ia = InetAddress.getByName(argv[0]);
 
             // get the port that we will be listening on
-            int port = Integer.parseInt(argv[1]);
+            //int port = Integer.parseInt(argv[1]);
 
             // create a multicast socket on the specified local port number
             MulticastSocket ms = new MulticastSocket(port);
@@ -64,6 +64,8 @@ public class MulticastReceiver implements Runnable {
 
             //Join a multicast group and wait for some action
             ms.joinGroup(ia);
+                        ms.setLoopbackMode(true);
+
             System.out.println("waiting for a packet from " + ia + "...");
             ms.receive(dp);
             byte[] data = dp.getData();

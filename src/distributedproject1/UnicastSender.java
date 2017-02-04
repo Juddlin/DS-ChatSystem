@@ -45,6 +45,7 @@ public class UnicastSender {
 			//ms.joinGroup(ia); 
 
 			// send the message with a Time-To-Live (TTL)=1
+                        ds.setReuseAddress(true);
 			ds.send(dp); 
 
 			// tidy up - leave the group and close the socket
